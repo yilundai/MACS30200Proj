@@ -1,0 +1,154 @@
+---
+title: "Project_Result"
+author: "Yilun Dai"
+date: "5/5/2018"
+output: html_document
+---
+
+
+```{r,echo=FALSE,warning=FALSE,message=FALSE}
+library(tseries)
+library(MASS)
+library(fma)
+library(vars)
+library(lattice)
+library(foreign)
+library(car)
+library(stats)
+#install.packages("stats4")#
+library(stats4)
+library(KernSmooth)
+library(fastICA)
+library(cluster)
+library(leaps)
+library(mgcv)
+library(rpart)
+library(pan)
+library(mgcv)
+library(DAAG)
+library("TTR")
+require("datasets")
+require(graphics)
+library("forecast")
+#install.packages("astsa")
+#require(astsa)
+library(xtable)
+# New libraries added:
+
+library(TSA)
+library(timeSeries)
+library(fUnitRoots)
+library(fBasics)
+
+library(timsac)
+library(TTR)
+library(fpp)
+library(strucchange)
+library(xts)
+#install.packages("xts")
+library(quantmod)
+library(PerformanceAnalytics)
+```
+
+```{r, echo= FALSE, warning=FALSE, message = FALSE}
+setwd("~/Documents/Spring2018/MACS30200/ProjectCode")
+tsdata <- read.csv("tsdata.csv", header = T, sep = ',')
+```
+
+```{r, echo= FALSE, warning=FALSE, message = FALSE}
+tfr <- ts(tsdata$tfr, start = c(1988, 01), end = c(2016, 01), freq = 1)
+filmtv <- ts(tsdata$FilmTV, start = c(1988, 01), end = c(2016, 01), freq = 1)
+age <- ts(tsdata$FemaleFirstMarriageAge,start = c(1988, 01), end = c(2016, 01), freq = 1)
+students <- ts(tsdata$students,start = c(1988, 01), end = c(2016, 01), freq = 1)
+tfr <- window(tfr, start = c(1995, 01), end = c(2016, 01), freq = 1)
+filmtv <- window(filmtv, start = c(1995, 01), end = c(2016, 01), freq = 1)
+age <- window(age, start = c(1995, 01), end = c(2016, 01), freq = 1)
+students <- window(students, start = c(1995, 01), end = c(2016, 01), freq = 1)
+```
+
+###1. fitting VAR model for tfr and filmtv
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+y_ts1 <- ts.union(tfr, filmtv)
+y_tot1 <- data.frame(y_ts1)
+VARselect(y_tot1, lag.max = 6)
+```
+
+#### fitting a VAR(2) model
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+y_model1 <- VAR(y_tot1, p = 2)
+summary(y_model1)
+```
+
+#### performing Granger Causality Test
+```{r, echo = FALSE, message= FALSE, warning = FALSE}
+grangertest(tfr ~ filmtv, order = 2)
+grangertest(filmtv ~ tfr, order = 2)
+```
+
+#### IRF with impulse from 
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+quartz.save('tfr and filmtv')
+plot(irf(y_model1, impulse = c('filmtv'), response = c('tfr'), n.ahead= 12))
+
+```
+
+###2. fitting VAR model for age and filmtv
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+y_ts2 <- ts.union(age, filmtv)
+y_tot2 <- data.frame(y_ts2)
+VARselect(y_tot2, lag.max = 6)
+```
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+y_model2 <- VAR(y_tot2, p = 3)
+summary(y_model2)
+```
+
+
+```{r, echo = FALSE, message= FALSE, warning = FALSE}
+grangertest(age ~ filmtv, order = 3)
+grangertest(filmtv ~ age, order = 3)
+```
+
+####.IRF with impulse from 
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+quartz.save('age and filmtv')
+plot(irf(y_model2, impulse = c('filmtv'), response = c('age'), n.ahead= 12))
+
+```
+
+###3. fitting VAR model for students and filmtv
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+y_ts3 <- ts.union(students, filmtv)
+y_tot3 <- data.frame(y_ts3)
+VARselect(y_tot3, lag.max = 5)
+```
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+y_model3 <- VAR(y_tot3, p = 5)
+summary(y_model3)
+```
+
+
+```{r, echo = FALSE, message= FALSE, warning = FALSE}
+grangertest(students ~ filmtv, order = 5)
+grangertest(filmtv ~ students, order = 5)
+```
+
+####3.IRF with impulse from 
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+quartz.save('students and filmtv')
+plot(irf(y_model3, impulse = c('students'), response = c('filmtv'), n.ahead= 12))
+
+```
+
+
+```{r, echo = FALSE, message= FALSE, warning = FALSE}
+library(ggplot2)
+ggplot(tsdata$yr[15:37], aes(x=tsdata$yr[15:37], y=tsdata$FilmTV[15:37])) + geom_bar(stat="identity")
+```
+
+```{r, echo = FALSE, message= FALSE, warning = FALSE}
+plot(students,ylab="Thousand",xlab="yr",main="Number of students studying abroad", col = 'skyblue3')
+quartz.save("TFR Trend")
+```
