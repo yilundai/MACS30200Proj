@@ -1,0 +1,29 @@
+---
+title: "PS3"
+author: "Yilun Dai"
+date: "5/11/2018"
+output: html_document
+---
+
+```{r setup, echo= FALSE, warning=FALSE, message = FALSE}
+set.seed(1234)
+#install.packages('keras')
+library(keras)
+
+
+```
+
+```{r}
+
+train_images <- mnist$train$x
+train_labels <- mnist$train$y
+test_images <- mnist$test$x
+test_labels <- mnist$test$y
+```
+
+
+
+```{r setup, echo= FALSE, warning=FALSE, message = FALSE}
+set.seed(1234)
+```
+
