@@ -51,7 +51,7 @@ library(PerformanceAnalytics)
 ```
 
 ```{r, echo= FALSE, warning=FALSE, message = FALSE}
-setwd("~/Documents/Spring2018/MACS30200/ProjectCode")
+setwd("~/Documents/Documents/Spring2018/MACS30200/ProjectCode")
 tsdata <- read.csv("tsdata.csv", header = T, sep = ',')
 ```
 
@@ -87,9 +87,9 @@ grangertest(filmtv ~ tfr, order = 2)
 
 #### IRF with impulse from 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
-quartz.save('tfr and filmtv')
-plot(irf(y_model1, impulse = c('filmtv'), response = c('tfr'), n.ahead= 12))
-
+png('trf and filmtv')
+plot(irf(y_model1, impulse = c('filmtv'), response = c('tfr'), n.ahead= 5))
+dev.off()
 ```
 
 ###2. fitting VAR model for age and filmtv
@@ -110,11 +110,11 @@ grangertest(age ~ filmtv, order = 3)
 grangertest(filmtv ~ age, order = 3)
 ```
 
-####.IRF with impulse from 
+####.IRF with impulse from filmtv
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
-quartz.save('age and filmtv')
-plot(irf(y_model2, impulse = c('filmtv'), response = c('age'), n.ahead= 12))
-
+png('age and filmtv_5')
+plot(irf(y_model2, impulse = c('filmtv'), response = c('age'), n.ahead= 5))
+dev.off()
 ```
 
 ###3. fitting VAR model for students and filmtv
@@ -135,20 +135,25 @@ grangertest(students ~ filmtv, order = 5)
 grangertest(filmtv ~ students, order = 5)
 ```
 
-####3.IRF with impulse from 
+####3.IRF with impulse from filmtv
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
-quartz.save('students and filmtv')
-plot(irf(y_model3, impulse = c('students'), response = c('filmtv'), n.ahead= 12))
+png('students and filmtv_6')
+plot(irf(y_model3, impulse = c('students'), response = c('filmtv'), n.ahead= 5))
+dev.off()
+```
 
+
+
+```{r, echo = FALSE, message= FALSE, warning = FALSE}
+png('CUSUM students2.png') 
+par(mfrow = c(2,1))
+plot(stability(y_model3, type = "Rec-CUSUM"), plot.type="single") 
+     #main = 'Residual Stability of Age ~ FilmTV')
+#plot(fevd(y_model3, n.ahead = 5))
+dev.off()
 ```
 
 
 ```{r, echo = FALSE, message= FALSE, warning = FALSE}
-library(ggplot2)
-ggplot(tsdata$yr[15:37], aes(x=tsdata$yr[15:37], y=tsdata$FilmTV[15:37])) + geom_bar(stat="identity")
-```
-
-```{r, echo = FALSE, message= FALSE, warning = FALSE}
-plot(students,ylab="Thousand",xlab="yr",main="Number of students studying abroad", col = 'skyblue3')
-quartz.save("TFR Trend")
+plot(fevd(y_model1, n.ahead = 5))
 ```
